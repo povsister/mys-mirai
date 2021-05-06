@@ -17,6 +17,8 @@ type Bot struct {
 // loginManager 负责登录以及断线重连相关的活
 type loginManger struct {
 	bot *Bot
+	// 是否已经登录 用来区分重连
+	alreadyLogin bool
 	// 重连次数限制
 	reConnLimit int
 	// 保证同时只有一次登录或者断线重连

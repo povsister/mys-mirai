@@ -22,7 +22,11 @@ var (
 func (b *Bot) Login() (err error) {
 	b.lm.mu.Lock()
 	defer b.lm.mu.Unlock()
+	if b.c.Online {
+		return
+	}
 	if err = b.lm.login(); err == nil {
+		b.lm.alreadyLogin = true
 		b.lm.setupReconnect()
 	}
 	return
@@ -34,7 +38,7 @@ func (l *loginManger) setupReconnect() {
 			l.mu.Lock()
 			defer l.mu.Unlock()
 
-			if l.bot.c.Online {
+			if c.Online {
 				return
 			}
 			log.Warn().Msgf("Bot[%d] 已离线: %s", l.bot.c.Uin, e.Message)
@@ -120,6 +124,11 @@ func (l *loginManger) handleLoginResponse(r *client.LoginResponse) (err error) {
 		if len(r.ErrorMessage) > 0 {
 			log.Debug().Str("from", "login").Msgf("err: %s", r.ErrorMessage)
 		}
+		// 自动重连的时候一般无人值守，所以碰到错误直接退出
+		if l.alreadyLogin {
+			log.Error().Str("errMsg", r.ErrorMessage).Msg("重连时出现错误 无法自动处理")
+			os.Exit(1)
+		}
 		switch r.Error {
 		case client.SliderNeededError:
 			log.Info().Msg("登录需要滑条验证码")
@@ -143,13 +152,13 @@ func (l *loginManger) handleLoginResponse(r *client.LoginResponse) (err error) {
 		case client.UnsafeDeviceError:
 			log.Info().Msg("登录需要设备锁")
 			log.Info().Str("verify_url", r.VerifyUrl).Msg("访问URL验证设备并重启Bot")
-			os.Exit(1)
+			return ErrLoginFailed
 		case client.TooManySMSRequestError:
 			log.Error().Msg("登录触发太多短信验证请求 请稍后重试")
-			os.Exit(1)
+			return ErrLoginFailed
 		case client.OtherLoginError, client.UnknownLoginError:
 			log.Error().Msgf("登录失败: %s", r.ErrorMessage)
-			os.Exit(1)
+			return ErrLoginFailed
 		}
 	}
 }
