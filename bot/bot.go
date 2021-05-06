@@ -9,6 +9,10 @@ import (
 	"github.com/povsister/mys-mirai/pkg/util/fs"
 )
 
+type EventListener interface {
+	Register(client *client.QQClient)
+}
+
 type Bot struct {
 	c  *client.QQClient
 	lm *loginManger
@@ -34,6 +38,10 @@ func NewBot(uid int64, pw string) *Bot {
 	b.setupLogHandler()
 	b.handleServerUpdated()
 	return b
+}
+
+func (b *Bot) RegisterEvent(l EventListener) {
+	l.Register(b.c)
 }
 
 func (b *Bot) handleServerUpdated() {

@@ -15,7 +15,7 @@ const configFile = "config.yaml"
 
 type Config struct {
 	Account struct {
-		Uin      int64  `yaml:"uid"`
+		Uin      int64  `yaml:"uin"`
 		Password string `yaml:"password"`
 	} `yaml:"account"`
 }
