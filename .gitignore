@@ -15,4 +15,7 @@
 # vendor/
 
 .idea
-log
+cmd/logs
+cmd/config.yaml
+resources/device.json
+

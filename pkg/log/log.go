@@ -1,11 +1,13 @@
 package log
 
 import (
-	"github.com/rs/zerolog"
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
 var defaultLogger zerolog.Logger
@@ -15,7 +17,10 @@ var (
 )
 
 func InitLogger() {
-	currentDir := filepath.Dir(os.Args[0])
+	currentDir, err := os.Getwd()
+	if err != nil {
+		currentDir = filepath.Dir(os.Args[0])
+	}
 	_ = os.MkdirAll(filepath.Join(currentDir, "logs"), 0755)
 
 	fd, err := NewRotator(filepath.Join(currentDir, "logs", "debug.log"))
@@ -24,7 +29,7 @@ func InitLogger() {
 	}
 
 	lw := &levelWriter{
-		ConsoleWriter: zerolog.ConsoleWriter{Out: os.Stderr, NoColor: true, TimeFormat: time.RFC3339}, l: Level,
+		ConsoleWriter: zerolog.ConsoleWriter{Out: os.Stderr, NoColor: runtime.GOOS != "linux", TimeFormat: time.RFC3339}, l: Level,
 	}
 	var w io.Writer = lw
 	if fd != nil {
@@ -68,4 +73,8 @@ func Error() *zerolog.Event {
 
 func Fatal() *zerolog.Event {
 	return defaultLogger.Fatal()
+}
+
+func With() zerolog.Context {
+	return defaultLogger.With()
 }

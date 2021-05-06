@@ -1,0 +1,37 @@
+{
+  "display": "MIRAI.266154.001",
+  "product": "mirai",
+  "device": "mirai",
+  "board": "mirai",
+  "model": "mirai",
+  "finger_print": "mamoe/mirai/mirai:10/MIRAI.200122.001/4215082:user/release-keys",
+  "boot_id": "a439be4a-fca6-0e6b-52e7-8a798af1345d",
+  "proc_version": "Linux version 3.0.31-MvCIFHYY (android-build@xxx.xxx.xxx.xxx.com)",
+  "protocol": 1,
+  "imei": "514349203157141",
+  "brand": "mamoe",
+  "bootloader": "unknown",
+  "base_band": "",
+  "version": {
+    "incremental": "5891938",
+    "release": "10",
+    "codename": "REL",
+    "sdk": 29
+  },
+  "sim_info": "T-Mobile",
+  "os_type": "android",
+  "mac_address": "00:50:56:C0:00:08",
+  "ip_address": [
+    10,
+    0,
+    1,
+    3
+  ],
+  "wifi_bssid": "00:50:56:C0:00:08",
+  "wifi_ssid": "<unknown ssid>",
+  "imsi_md5": "51cdf2a319abfc9c9f1c721bbb36069d",
+  "android_id": "3439c0c40fb8f3fd",
+  "apn": "wifi",
+  "vendor_name": "MIUI",
+  "vendor_os_name": "mirai"
+}

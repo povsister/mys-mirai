@@ -1,0 +1,6 @@
+# 配置文件模板
+
+account:
+  uin: 0
+  password: ""
+
