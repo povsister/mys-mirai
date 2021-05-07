@@ -28,6 +28,7 @@ func (b *Bot) Login() (err error) {
 	if err = b.lm.login(); err == nil {
 		b.lm.alreadyLogin = true
 		b.lm.setupReconnect()
+		b.registerKnownEvents()
 	}
 	return
 }
@@ -136,13 +137,13 @@ func (l *loginManger) handleLoginResponse(r *client.LoginResponse) (err error) {
 			input = term.Readline("Ticket: ")
 			r, err = l.bot.c.SubmitTicket(input)
 		case client.NeedCaptcha:
-			log.Info().Msg("登录需要验证码")
+			log.Info().Msg("登录需要验证码: captcha.jpg")
 			fs.MustWriteFile("captcha.jpg", r.CaptchaImage, 0644)
 			input = term.Readline("Captcha: ")
 			r, err = l.bot.c.SubmitCaptcha(input, r.CaptchaSign)
 		case client.SMSNeededError, client.SMSOrVerifyNeededError:
 			log.Info().Msgf("登录需要设备锁 按Enter向手机 %s 发送验证码", r.SMSPhone)
-			term.Readline()
+			term.Readline("Press ENTER to continue ...")
 			if !l.bot.c.RequestSMS() {
 				log.Error().Msg("请求验证码失败")
 				return ErrLoginFailed

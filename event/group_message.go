@@ -3,10 +3,15 @@ package event
 import (
 	"github.com/Mrs4s/MiraiGo/client"
 	"github.com/Mrs4s/MiraiGo/message"
+	"github.com/povsister/mys-mirai/bot"
 	"strings"
 )
 
 var GroupMessageListener = new(groupMessage)
+
+func init() {
+	bot.RegisterEvent(GroupMessageListener)
+}
 
 type groupMessage struct {
 }

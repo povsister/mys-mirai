@@ -9,10 +9,20 @@ import (
 	"github.com/povsister/mys-mirai/pkg/util/fs"
 )
 
+// 由 event listener 实现
 type EventListener interface {
 	Register(client *client.QQClient)
 }
 
+// 所有注册过的event listener
+var registeredListener = make([]EventListener, 0, 10)
+
+// 用于event向bot注册event listener
+func RegisterEvent(e EventListener) {
+	registeredListener = append(registeredListener, e)
+}
+
+// bot
 type Bot struct {
 	c  *client.QQClient
 	lm *loginManger
@@ -40,8 +50,11 @@ func NewBot(uid int64, pw string) *Bot {
 	return b
 }
 
-func (b *Bot) RegisterEvent(l EventListener) {
-	l.Register(b.c)
+// 启动所有注册过的 event listener
+func (b *Bot) registerKnownEvents() {
+	for _, e := range registeredListener {
+		e.Register(b.c)
+	}
 }
 
 func (b *Bot) handleServerUpdated() {

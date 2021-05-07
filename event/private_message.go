@@ -3,9 +3,14 @@ package event
 import (
 	"github.com/Mrs4s/MiraiGo/client"
 	"github.com/Mrs4s/MiraiGo/message"
+	"github.com/povsister/mys-mirai/bot"
 )
 
 var PrivateMessageListener = new(privateMessage)
+
+func init() {
+	bot.RegisterEvent(PrivateMessageListener)
+}
 
 type privateMessage struct {
 }
