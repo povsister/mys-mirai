@@ -17,6 +17,7 @@
 *.token
 .idea
 cmd/logs
+cmd/test
 cmd/config.yaml
 resources/device.json
 

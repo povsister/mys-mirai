@@ -20,6 +20,7 @@ func main() {
 		return
 	}
 
+	log.Info().Msg("Bot启动完成 Ctrl+C 退出")
 	// wait for interrupt signal
 	<-util.SetupSignalHandler()
 }
