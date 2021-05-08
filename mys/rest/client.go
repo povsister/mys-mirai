@@ -4,14 +4,25 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
-	"github.com/go-resty/resty/v2"
-	"github.com/google/uuid"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/go-resty/resty/v2"
+	"github.com/google/uuid"
 )
+
+type Interface interface {
+	Verb(verb string) *Request
+	Post() *Request
+	Get() *Request
+	Put() *Request
+	Delete() *Request
+	Head() *Request
+}
 
 type RESTClient struct {
 	base *url.URL
@@ -26,6 +37,10 @@ func NewRESTClient(base *url.URL, cfg *Config) *RESTClient {
 	c := resty.New()
 	c.SetRetryCount(1)
 	c.SetCookies(cfg.Cookie.Cookies(base))
+
+	if !strings.HasSuffix(base.Path, "/") {
+		base.Path += "/"
+	}
 
 	restC := &RESTClient{
 		base: base,
