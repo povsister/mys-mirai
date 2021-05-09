@@ -1,24 +1,67 @@
 package meta
 
+import "github.com/povsister/mys-mirai/mys/rest"
+
+type DeleteReason uint8
+
+const (
+	// 默认  无原因 向后兼容
+	NoReason DeleteReason = 0
+	// 包含引战/人身攻击/挂人/攻击他人作品行为
+	AttackOthers DeleteReason = 1
+	// 复制粘贴跟风刷屏行为
+	SPAMorFlood DeleteReason = 2
+	// 内容涉嫌侵权
+	UnauthorizedRepublish DeleteReason = 3
+	// 包含交易、账号转送、广告内容
+	AccountTrade DeleteReason = 4
+	// 包含其他游戏、社区平台、App相关内容及链接等引流行为
+	OuterLink DeleteReason = 5
+	// 发布与版区对应游戏无关内容
+	UnrelatedContent DeleteReason = 6
+	// 包含未证实/虚假信息
+	FakeNewsOrReveals DeleteReason = 7
+	// 包含违反游戏用户协议内容
+	GameRuleViolation DeleteReason = 8
+	// 违反社区用户服务协议
+	ForumRuleViolation DeleteReason = 9
+	// 包含违反国家法律法规政策的内容
+	LawViolation DeleteReason = 10
+	// 包含违反公序良俗的内容
+	MoralityViolation DeleteReason = 11
+)
+
 type DeletePostOptions struct {
 	Reason DeleteReason
 }
 
-const (
-	NoReason              DeleteReason = 0
-	AttackOthers          DeleteReason = 1
-	SPAM                  DeleteReason = 2
-	UnauthorizedRepublish DeleteReason = 3
-	AccountTrade          DeleteReason = 4
-	OuterLink             DeleteReason = 5
-	UnrelatedContent      DeleteReason = 6
-	FakeNews              DeleteReason = 7
-	// TODO
-)
+func (dpo DeletePostOptions) Apply(r *rest.Request) *rest.Request {
+	if dpo.Reason != NoReason {
+		r.BodyKV("config_id", dpo.Reason)
+	}
+	return r
+}
 
-type DeleteReason uint8
+type TopicList []Topic
 
 type MovePostOptions struct {
-	To Forum
-	// TODO
+	To         Forum
+	WithTopics TopicList
+}
+
+func (mpo MovePostOptions) Apply(r *rest.Request) *rest.Request {
+	r.BodyKV("f_forum_id", mpo.To)
+	if len(mpo.WithTopics) > 0 {
+		r.BodyKV("topic_ids", mpo.WithTopics)
+	}
+	return r
+}
+
+type RemoveTopicOptions struct {
+	Remove TopicList
+}
+
+func (rto RemoveTopicOptions) Apply(r *rest.Request) *rest.Request {
+	r.BodyKV("topic_ids", rto.Remove)
+	return r
 }

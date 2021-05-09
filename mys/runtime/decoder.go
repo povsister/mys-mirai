@@ -16,13 +16,13 @@ func init() {
 }
 
 type Decoder interface {
-	// decoder name. Typically: ContentType
-	Name() string
+	// Typically: ContentType
+	MineType() string
 	Decode(data []byte, into Object) (err error)
 }
 
 func RegisterDecoder(d Decoder) {
-	knownDecoders[d.Name()] = d
+	knownDecoders[d.MineType()] = d
 }
 
 func NegotiateDecoder(mineType string) Decoder {
@@ -36,7 +36,7 @@ func newJsonDecoder() *jsonDecoder {
 	return &jsonDecoder{}
 }
 
-func (d *jsonDecoder) Name() string {
+func (d *jsonDecoder) MineType() string {
 	return ContentTypeJSON
 }
 

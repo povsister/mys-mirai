@@ -2,31 +2,29 @@ package rest
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/povsister/mys-mirai/mys/api/request/meta"
 	"github.com/povsister/mys-mirai/mys/runtime"
 	"github.com/povsister/mys-mirai/pkg/log"
 )
 
 var logger = log.With().Str("from", "mys.rest").Logger()
 
-type BodyBuilder map[string]interface{}
+type bodyBuilder map[string]interface{}
 
-func NewBodyBuilder() BodyBuilder {
+func newBodyBuilder() bodyBuilder {
 	return make(map[string]interface{})
 }
 
-func (b BodyBuilder) Set(k string, v interface{}) BodyBuilder {
-	b[k] = k
-	return b
+func (b bodyBuilder) Set(k string, v interface{}) {
+	b[k] = v
 }
 
-func (b BodyBuilder) Delete(k string) BodyBuilder {
+func (b bodyBuilder) Delete(k string) {
 	delete(b, k)
-	return b
 }
 
 type Request struct {
@@ -36,15 +34,16 @@ type Request struct {
 	verb    string
 	path    string
 	params  url.Values
-	headers http.Header
-	body    BodyBuilder
+	headers map[string]string
+	body    bodyBuilder
 
-	gid meta.GameType
+	gid GameType
 
+	// error detained
 	err error
 }
 
-func (r *Request) GID(id meta.GameType) *Request {
+func (r *Request) GID(id GameType) *Request {
 	r.gid = id
 	return r
 }
@@ -54,10 +53,35 @@ func (r *Request) Path(path string) *Request {
 	return r
 }
 
+func (r *Request) ParamAdd(k, v string) *Request {
+	if r.params == nil {
+		r.params = url.Values{}
+	}
+	r.params.Add(k, v)
+	return r
+}
+
+func (r *Request) ParamSet(k, v string) *Request {
+	if r.params == nil {
+		r.params = url.Values{}
+	}
+	r.params.Set(k, v)
+	return r
+}
+
+// set request header
+func (r *Request) Header(k, v string) *Request {
+	if r.headers == nil {
+		r.headers = make(map[string]string)
+	}
+	r.headers[k] = v
+	return r
+}
+
 // k-v request body. Auto marshall to json
 func (r *Request) BodyKV(k string, v interface{}) *Request {
 	if r.body == nil {
-		r.body = NewBodyBuilder()
+		r.body = newBodyBuilder()
 	}
 	r.body.Set(k, v)
 	return r
@@ -70,16 +94,38 @@ func (r *Request) Body(obj interface{}) *Request {
 }
 
 func (r *Request) Do() *Result {
+	if r.err != nil {
+		return &Result{err: r.err}
+	}
+
 	r.r.Method = r.verb
+	// set request body
 	if r.body != nil {
-		if r.gid != meta.NoForum {
+		if r.gid != NoForum {
 			r.body.Set("gid", r.gid)
 		}
 		r.r.SetBody(r.body)
 	}
+	// set request param
+	if len(r.params) > 0 && r.gid != NoForum {
+		r.params.Set("gid", strconv.Itoa(int(r.gid)))
+		r.r.QueryParam = r.params
+	}
+	// compose request url
+	u := url.URL{
+		Scheme: r.c.base.Scheme,
+		Host:   r.c.base.Host,
+		Path:   r.c.base.Path + strings.TrimLeft(r.path, "/"),
+	}
+	r.r.URL = u.String()
+	// set additional headers if any
+	if r.headers != nil {
+		r.r.SetHeaders(r.headers)
+	}
+	// send out the request
 	resp, err := r.r.Send()
 	if err != nil {
-		return &Result{err: err}
+		return &Result{resp: resp, err: err}
 	}
 	return r.transformResponse(resp)
 }
@@ -99,7 +145,7 @@ type Result struct {
 
 func (r *Result) Into(obj runtime.Object) error {
 	if r.err != nil {
-		return r.Error()
+		return r.err
 	}
 	if r.decoder == nil {
 		return fmt.Errorf("no decoder specified for content-type %q", r.resp.Header().Get("Content-Type"))

@@ -1,7 +1,6 @@
 package moderator
 
 import (
-	"github.com/povsister/mys-mirai/mys/api/request/meta"
 	"github.com/povsister/mys-mirai/mys/rest"
 )
 
@@ -9,6 +8,14 @@ type ModeratorClient struct {
 	restClient rest.Interface
 }
 
-func (c *ModeratorClient) Post(forum meta.GameType) PostInterface {
-	return newPostManger(c, forum)
+func NewModeratorClient(c rest.Interface) *ModeratorClient {
+	return &ModeratorClient{restClient: c}
+}
+
+func (c *ModeratorClient) Post(gid rest.GameType) PostInterface {
+	return newPostManger(c, gid)
+}
+
+func (c *ModeratorClient) User(gid rest.GameType) UserInterface {
+	return newUserManager(c, gid)
 }

@@ -25,7 +25,7 @@ type Interface interface {
 }
 
 type RESTClient struct {
-	base *url.URL
+	base url.URL
 	c    *resty.Client
 }
 
@@ -33,10 +33,10 @@ type Config struct {
 	Cookie http.CookieJar
 }
 
-func NewRESTClient(base *url.URL, cfg *Config) *RESTClient {
+func NewRESTClient(base url.URL, cfg *Config) *RESTClient {
 	c := resty.New()
 	c.SetRetryCount(1)
-	c.SetCookies(cfg.Cookie.Cookies(base))
+	c.SetCookies(cfg.Cookie.Cookies(&base))
 
 	if !strings.HasSuffix(base.Path, "/") {
 		base.Path += "/"

@@ -7,33 +7,39 @@ import (
 
 type PostInterface interface {
 	Delete(pid int, opt meta.DeletePostOptions) error
+	Move(pid int, opt meta.MovePostOptions) error
+	RemoveTopic(pid int, opt meta.RemoveTopicOptions) error
 }
 
 type postManger struct {
 	client rest.Interface
-	gid    meta.GameType
+	gid    rest.GameType
 }
 
-func newPostManger(c *ModeratorClient, forum meta.GameType) *postManger {
-	return &postManger{client: c.restClient, gid: forum}
+func newPostManger(c *ModeratorClient, gid rest.GameType) *postManger {
+	return &postManger{client: c.restClient, gid: gid}
 }
 
 func (c *postManger) Delete(pid int, opt meta.DeletePostOptions) error {
-	r := c.client.Post().
+	return opt.Apply(c.client.Post()).
 		GID(c.gid).
 		Path("/post/wapi/deletePost").
-		BodyKV("post_id", pid)
-	if opt.Reason != meta.NoReason {
-		r.BodyKV("config_id", opt.Reason)
-	}
-	return r.Do().Error()
+		BodyKV("post_id", pid).
+		Do().Error()
 }
 
 func (c *postManger) Move(pid int, opt meta.MovePostOptions) error {
-	return c.client.Post().
+	return opt.Apply(c.client.Post()).
 		GID(c.gid).
 		Path("/post/wapi/movePost").
 		BodyKV("post_id", pid).
-		BodyKV("f_forum_id", opt.To).
+		Do().Error()
+}
+
+func (c *postManger) RemoveTopic(pid int, opt meta.RemoveTopicOptions) error {
+	return opt.Apply(c.client.Post()).
+		GID(c.gid).
+		Path("/post/wapi/removePostTopicsByTopicIDs").
+		BodyKV("post_id", pid).
 		Do().Error()
 }
