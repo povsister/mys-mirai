@@ -1,5 +1,7 @@
 package rest
 
+import "net/http"
+
 func (c *RESTClient) Verb(verb string) *Request {
 	req := &Request{c: c, r: c.c.R(), verb: verb}
 	return req
@@ -23,4 +25,8 @@ func (c *RESTClient) Delete() *Request {
 
 func (c *RESTClient) Head() *Request {
 	return c.Verb("HEAD")
+}
+
+func (c *RESTClient) Cookies() []*http.Cookie {
+	return c.c.Cookies
 }

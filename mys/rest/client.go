@@ -22,6 +22,8 @@ type Interface interface {
 	Put() *Request
 	Delete() *Request
 	Head() *Request
+
+	Cookies() []*http.Cookie
 }
 
 type RESTClient struct {
@@ -30,14 +32,19 @@ type RESTClient struct {
 }
 
 type Config struct {
-	Cookie http.CookieJar
+	Cookie []*http.Cookie
+}
+
+func NewConfig(ck []*http.Cookie) *Config {
+	return &Config{Cookie: ck}
 }
 
 func NewRESTClient(base url.URL, cfg *Config) *RESTClient {
 	c := resty.New()
 	c.SetRetryCount(1)
-	c.SetCookies(cfg.Cookie.Cookies(&base))
-
+	if len(cfg.Cookie) > 0 {
+		c.SetCookies(cfg.Cookie)
+	}
 	if !strings.HasSuffix(base.Path, "/") {
 		base.Path += "/"
 	}

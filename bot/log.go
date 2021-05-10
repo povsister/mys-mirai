@@ -21,7 +21,7 @@ var ErrUnknownLogLevel = errors.New("unknown mirai loglevel")
 
 // 设置来自mirai core的log转发
 func (b *Bot) setupLogHandler() {
-	sublogger := log.With().Str("from", "mirai").Logger()
+	sublogger := log.SubLogger("mirai")
 	b.c.OnLog(func(c *client.QQClient, e *client.LogEvent) {
 		switch miraiLogLevel(e.Type) {
 		case Trace:

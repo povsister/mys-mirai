@@ -11,7 +11,11 @@ import (
 	"github.com/povsister/mys-mirai/pkg/log"
 )
 
-var logger = log.With().Str("from", "mys.rest").Logger()
+var logger log.Logger
+
+func init() {
+	logger = log.SubLogger("mys.rest")
+}
 
 type bodyBuilder map[string]interface{}
 

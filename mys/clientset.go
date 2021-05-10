@@ -1,9 +1,10 @@
 package mys
 
 import (
+	"net/url"
+
 	"github.com/povsister/mys-mirai/mys/api/request/moderator"
 	"github.com/povsister/mys-mirai/mys/rest"
-	"net/url"
 )
 
 var MysApiBase = url.URL{
@@ -13,7 +14,12 @@ var MysApiBase = url.URL{
 }
 
 type Clientset struct {
-	moderator *moderator.ModeratorClient
+	restClient rest.Interface
+	moderator  *moderator.ModeratorClient
+}
+
+func (c *Clientset) RESTClient() rest.Interface {
+	return c.restClient
 }
 
 func (c *Clientset) Moderator() *moderator.ModeratorClient {
@@ -24,6 +30,7 @@ func NewClient(config *rest.Config) *Clientset {
 	restClient := rest.NewRESTClient(MysApiBase, config)
 
 	return &Clientset{
-		moderator: moderator.NewModeratorClient(restClient),
+		restClient: restClient,
+		moderator:  moderator.NewModeratorClient(restClient),
 	}
 }

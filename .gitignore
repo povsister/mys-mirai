@@ -19,5 +19,9 @@
 cmd/logs
 cmd/test
 cmd/config.yaml
-resources/device.json
+resources/json/device.json
+resources/cookie/*
+!resources/cookie/sample_qid.cookie
+cookies
+logs
 

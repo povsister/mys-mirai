@@ -16,7 +16,26 @@ var (
 	Level = zerolog.InfoLevel
 )
 
-func InitLogger() {
+func init() {
+	initLogger()
+}
+
+type Logger interface {
+	With() zerolog.Context
+	Trace() *zerolog.Event
+	Debug() *zerolog.Event
+	Info() *zerolog.Event
+	Warn() *zerolog.Event
+	Error() *zerolog.Event
+	Fatal() *zerolog.Event
+}
+
+func SubLogger(from string) Logger {
+	l := defaultLogger.With().Str("from", from).Logger()
+	return &l
+}
+
+func initLogger() {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		currentDir = filepath.Dir(os.Args[0])

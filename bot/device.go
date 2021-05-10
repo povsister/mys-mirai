@@ -22,7 +22,7 @@ func (b *Bot) loadDeviceJSON() {
 		return
 	}
 
-	if embd, err := resources.FS.ReadFile("device.json"); err == nil {
+	if embd, err := resources.FS.ReadFile("json/device.json"); err == nil {
 		log.Info().Msg("使用编译时提供的 embed device.json")
 		if err = client.SystemDeviceInfo.ReadJson(embd); err == nil {
 			return

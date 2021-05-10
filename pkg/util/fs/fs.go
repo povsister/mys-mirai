@@ -31,3 +31,11 @@ func MustWriteFile(path string, data []byte, m fs.FileMode) {
 		panic(err)
 	}
 }
+
+func ReadDir(path string) ([]fs.DirEntry, error) {
+	return os.ReadDir(path)
+}
+
+func MkDir(path string) error {
+	return os.MkdirAll(path, 0755)
+}

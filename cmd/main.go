@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	log.InitLogger()
-
 	cfg := config.Read()
 	if cfg == nil {
 		return
