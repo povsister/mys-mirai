@@ -1,8 +1,9 @@
 package meta
 
 import (
-	"github.com/povsister/mys-mirai/mys/rest"
 	"time"
+
+	"github.com/povsister/mys-mirai/mys/rest"
 )
 
 type ForumSilence struct {
@@ -45,4 +46,14 @@ func (usuo UnSilenceUserOptions) Apply(r *rest.Request) *rest.Request {
 		return r
 	}
 	return r.BodyKV("forum_id", usuo.UnSilenceForum)
+}
+
+// 自己的uid 用于不填的默认行为
+const MySelfUser = 0
+
+type UserInfoGetOptions struct {
+}
+
+func (uio UserInfoGetOptions) Apply(r *rest.Request) *rest.Request {
+	return r
 }

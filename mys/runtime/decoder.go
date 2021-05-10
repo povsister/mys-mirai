@@ -1,6 +1,8 @@
 package runtime
 
-import "encoding/json"
+import (
+	jsoniter "github.com/json-iterator/go"
+)
 
 const (
 	ContentTypeJSON = "application/json"
@@ -41,5 +43,5 @@ func (d *jsonDecoder) MineType() string {
 }
 
 func (d *jsonDecoder) Decode(data []byte, into Object) error {
-	return json.Unmarshal(data, into)
+	return jsoniter.Unmarshal(data, into)
 }
