@@ -2,7 +2,6 @@ package bot
 
 import (
 	"github.com/Mrs4s/MiraiGo/message"
-	"github.com/povsister/mys-mirai/pkg/qqmsg"
 )
 
 func (b *Bot) ReplyStr(m interface{}, reply string) {
@@ -54,7 +53,7 @@ func (b *Bot) sendPrivateMsg(uin int64, send string) {
 }
 
 func (b *Bot) SendOrReplyStrByMsg(m interface{}, toSend string) {
-	if qqmsg.IsPrivateMsg(m) {
+	if IsPrivateMsg(m) {
 		b.SendStrByMsg(m, toSend)
 		return
 	}

@@ -4,16 +4,26 @@ import (
 	"github.com/povsister/mys-mirai/bot"
 	"github.com/povsister/mys-mirai/event/router"
 	"github.com/povsister/mys-mirai/mys/api/request/meta"
-	"github.com/povsister/mys-mirai/pkg/qqmsg"
 	"time"
 )
 
+type handlerDetail struct {
+	Descr   string
+	Handler router.Handle
+}
+
+var moderatorHandlers = map[string]handlerDetail{
+	"/删帖/:reason":              {"删除帖子并指定原因", handlePostDelete},
+	"/删帖":                      {"删除帖子，使用默认原因", handlePostDelete},
+	"/移水":                      {"快速移动至水史莱姆聚集地", handleWaterPostMove},
+	"/招募":                      {"快速移动至好友招募区", handleFriendRecruit},
+	"/删帖/:reason/禁言/:duration": {"删帖并禁言，例如 /删帖/色图/禁言/72h", handleDeleteAndMute},
+}
+
 func init() {
-	router.Router.RegisterHandler(router.Message, "/删帖/:reason", handlePostDelete)
-	router.Router.RegisterHandler(router.Message, "/删帖", handlePostDelete)
-	router.Router.RegisterHandler(router.Message, "/移水", handleWaterPostMove)
-	router.Router.RegisterHandler(router.Message, "/招募", handleFriendRecruit)
-	router.Router.RegisterHandler(router.Message, "/删帖/:reason/禁言/:duration", handleDeleteAndMute)
+	for path, h := range moderatorHandlers {
+		router.Router.RegisterHandler(router.Message, path, h.Handler)
+	}
 }
 
 const (
@@ -27,7 +37,7 @@ func handlePostDelete(b *bot.Bot, m interface{}, ps router.Params) {
 	if mys == nil {
 		return
 	}
-	gid, pid := qqmsg.ExtractMysPostID(m)
+	gid, pid := b.ExtractMysPostID(m)
 	if pid == 0 {
 		b.ReplyStr(m, errNoPidFound)
 		return
@@ -55,7 +65,7 @@ func movePost(b *bot.Bot, m interface{}, f meta.Forum, topic ...meta.Topic) {
 	if mys == nil {
 		return
 	}
-	gid, pid := qqmsg.ExtractMysPostID(m)
+	gid, pid := b.ExtractMysPostID(m)
 	if pid == 0 {
 		b.ReplyStr(m, errNoPidFound)
 		return
@@ -73,7 +83,7 @@ func handleDeleteAndMute(b *bot.Bot, m interface{}, ps router.Params) {
 	if mys == nil {
 		return
 	}
-	gid, pid := qqmsg.ExtractMysPostID(m)
+	gid, pid := b.ExtractMysPostID(m)
 	if pid == 0 {
 		b.ReplyStr(m, errNoPidFound)
 		return

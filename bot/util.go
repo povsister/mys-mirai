@@ -1,19 +1,12 @@
-package qqmsg
+package bot
 
 import (
 	"github.com/Mrs4s/MiraiGo/message"
 	"github.com/povsister/mys-mirai/mys/rest"
-	"github.com/povsister/mys-mirai/pkg/log"
 	"regexp"
 	"strconv"
 	"strings"
 )
-
-var logger log.Logger
-
-func init() {
-	logger = log.SubLogger("util.qqmsg")
-}
 
 func IsPrivateMsg(m interface{}) bool {
 	_, ok := m.(*message.PrivateMessage)
@@ -98,11 +91,34 @@ func extractMysPostIdFromElems(es []message.IMessageElement) (rest.GameType, int
 	return rest.NoGame, 0
 }
 
-func ExtractMysPostID(m interface{}) (rest.GameType, int) {
+// 尽量把reply elements的内容替换成全的
+func enrichGroupMsgFromCache(b *Bot, m *message.GroupMessage) {
+	for _, e := range m.Elements {
+		if replyE, ok := e.(*message.ReplyElement); ok {
+			if prev := b.LookupGroupMessage(m.GroupCode, replyE.ReplySeq); prev != nil {
+				replyE.Elements = prev.Elements
+			}
+		}
+	}
+}
+
+func enrichPrivateMsgFromCache(b *Bot, m *message.PrivateMessage) {
+	for _, e := range m.Elements {
+		if replyE, ok := e.(*message.ReplyElement); ok {
+			if prev := b.LookupPrivateMessage(m.Sender.Uin, replyE.ReplySeq); prev != nil {
+				replyE.Elements = prev.Elements
+			}
+		}
+	}
+}
+
+func (b *Bot) ExtractMysPostID(m interface{}) (rest.GameType, int) {
 	switch msg := m.(type) {
 	case *message.GroupMessage:
+		enrichGroupMsgFromCache(b, msg)
 		return extractMysPostIdFromElems(msg.Elements)
 	case *message.PrivateMessage:
+		enrichPrivateMsgFromCache(b, msg)
 		return extractMysPostIdFromElems(msg.Elements)
 	default:
 		logger.Error().Msgf("can not extract uin. unknown message type %T", m)

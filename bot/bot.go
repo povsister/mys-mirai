@@ -3,9 +3,9 @@ package bot
 import (
 	"fmt"
 	"github.com/Mrs4s/MiraiGo/client"
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/povsister/mys-mirai/mys"
 	"github.com/povsister/mys-mirai/pkg/log"
-	"github.com/povsister/mys-mirai/pkg/qqmsg"
 	"github.com/povsister/mys-mirai/pkg/util/fs"
 )
 
@@ -31,9 +31,10 @@ func RegisterEvent(e EventListener) {
 
 // bot
 type Bot struct {
-	c   *client.QQClient
-	lm  *loginManger
-	mys *mys.UserManager
+	c        *client.QQClient
+	lm       *loginManger
+	mys      *mys.UserManager
+	msgCache *lru.ARCCache
 }
 
 func NewBot(uid int64, pw string) *Bot {
@@ -44,6 +45,12 @@ func NewBot(uid int64, pw string) *Bot {
 	b.setupLogHandler()
 	b.handleServerUpdated()
 	b.mys = mys.NewUserManager()
+	lruc, err := lru.NewARC(5000)
+	if err != nil {
+		log.Warn().Err(err).Msg("缓存初始化失败 将无法正常记录历史消息")
+	} else {
+		b.msgCache = lruc
+	}
 	return b
 }
 
@@ -57,7 +64,7 @@ func (b *Bot) M() *mys.UserManager {
 
 // 从消息自动获取对应的 mys client
 func (b *Bot) MByMsg(m interface{}) *mys.Clientset {
-	uin := qqmsg.ExtractMsgSenderUin(m)
+	uin := ExtractMsgSenderUin(m)
 	if uin == 0 {
 		return nil
 	}

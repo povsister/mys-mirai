@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"github.com/povsister/mys-mirai/bot"
 	"github.com/povsister/mys-mirai/pkg/log"
-	"github.com/povsister/mys-mirai/pkg/qqmsg"
 	"io"
 	"strings"
 	"sync"
@@ -101,7 +100,7 @@ func (r *router) handle(b *bot.Bot, t callbackType, path string, m interface{}) 
 
 	l := logger.Debug().Str("path", path)
 	switch knownMsg := m.(type) {
-	case qqmsg.MessageStringer:
+	case bot.MessageStringer:
 		l.Str("msg", knownMsg.ToString())
 	}
 
@@ -142,12 +141,13 @@ func readCommandToken(msgByte, text []byte) string {
 	return string(bytes.Trim(path, " \r\n"))
 }
 
-func (r *router) HandleMessage(b *bot.Bot, m qqmsg.MessageStringer) {
+func (r *router) HandleMessage(b *bot.Bot, m bot.MessageStringer) {
 	msgByte := []byte(m.ToString())
 	if len(msgByte) == 0 {
 		return
 	}
-	text := qqmsg.ExtractLastTextElement(m)
+	b.RecordMessage(m)
+	text := bot.ExtractLastTextElement(m)
 	if text == nil {
 		return
 	}
