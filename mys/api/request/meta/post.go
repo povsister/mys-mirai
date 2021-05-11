@@ -1,6 +1,9 @@
 package meta
 
-import "github.com/povsister/mys-mirai/mys/rest"
+import (
+	"github.com/povsister/mys-mirai/mys/rest"
+	"regexp"
+)
 
 type DeleteReason uint8
 
@@ -42,6 +45,30 @@ func (dpo DeletePostOptions) Apply(r *rest.Request) *rest.Request {
 	return r
 }
 
+var guessRgx = map[DeleteReason]*regexp.Regexp{
+	AttackOthers:          regexp.MustCompile(".*引战|挂人|攻击.*"),
+	SPAMorFlood:           regexp.MustCompile(".*跟风|刷屏|复制粘贴.*"),
+	UnauthorizedRepublish: regexp.MustCompile(".*侵权|未授权.*"),
+	AccountTrade:          regexp.MustCompile(".*交易|送号|广告.*"),
+	OuterLink:             regexp.MustCompile(".*引流|外部链接.*"),
+	UnrelatedContent:      regexp.MustCompile(".*无关|错区.*"),
+	FakeNewsOrReveals:     regexp.MustCompile(".*内鬼|未证实|未实.*"),
+	GameRuleViolation:     regexp.MustCompile(".*游戏用户协议.*"),
+	ForumRuleViolation:    regexp.MustCompile(".*色图|社区用户协议|片哥.*"),
+	LawViolation:          regexp.MustCompile(".*违法|国家法律.*"),
+	MoralityViolation:     regexp.MustCompile(".*道德|公序良俗.*"),
+}
+
+func GuessDeleteReason(s string) (ret DeleteReason) {
+	for r, rgx := range guessRgx {
+		if rgx.MatchString(s) {
+			ret = r
+			break
+		}
+	}
+	return
+}
+
 type TopicList []Topic
 
 type MovePostOptions struct {
@@ -63,5 +90,12 @@ type RemoveTopicOptions struct {
 
 func (rto RemoveTopicOptions) Apply(r *rest.Request) *rest.Request {
 	r.BodyKV("topic_ids", rto.Remove)
+	return r
+}
+
+type GetPostOptions struct {
+}
+
+func (gpo GetPostOptions) Apply(r *rest.Request) *rest.Request {
 	return r
 }

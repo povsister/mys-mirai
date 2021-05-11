@@ -210,3 +210,8 @@ func (r *Result) Error() error {
 	}
 	return nil
 }
+
+func IsApplicationErr(err error) bool {
+	_, ok := err.(runtime.Object)
+	return ok
+}

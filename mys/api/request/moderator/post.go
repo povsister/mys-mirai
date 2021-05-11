@@ -5,7 +5,7 @@ import (
 	"github.com/povsister/mys-mirai/mys/rest"
 )
 
-type PostInterface interface {
+type PostMngInterface interface {
 	Delete(pid int, opt meta.DeletePostOptions) error
 	Move(pid int, opt meta.MovePostOptions) error
 	RemoveTopic(pid int, opt meta.RemoveTopicOptions) error

@@ -35,6 +35,7 @@ type RESTClient struct {
 
 type Config struct {
 	Cookie []*http.Cookie
+	Qid    int64
 }
 
 func NewConfig(ck []*http.Cookie) *Config {

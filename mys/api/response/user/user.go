@@ -67,20 +67,26 @@ type FanStatus struct {
 	IsMyFan bool `json:"is_followed"`
 }
 
+type UserInfoBasic struct {
+	Avatar          Avatar        `json:"avatar"`
+	AvatarURL       string        `json:"avatar_url"`
+	Certification   Certification `json:"certification"`
+	Gender          Gender        `json:"gender"`
+	SelfDescription string        `json:"introduce"`
+	CurrentExp      ExpStatus     `json:"level_exp"`
+	Nickname        string        `json:"nickname"`
+	PendantURL      string        `json:"pendant"`
+	UID             runtime.Int   `json:"uid"`
+	// the following may not exist
+	FanStatus `json:",inline"`
+}
+
 type UserInfo struct {
-	Achieve         Achieve               `json:"achieve"`
-	Avatar          Avatar                `json:"avatar"`
-	AvatarURL       string                `json:"avatar_url"`
-	Certification   Certification         `json:"certification"`
-	Certifications  []CertificationDetail `json:"certifications"`
-	CommunityInfo   MysInfo               `json:"community_info"`
-	CurrentExp      ExpStatus             `json:"level_exp"`
-	Exps            []ExpStatus           `json:"level_exps"`
-	Gender          Gender                `json:"gender"`
-	SelfDescription string                `json:"introduce"`
-	Nickname        string                `json:"nickname"`
-	PendantURL      string                `json:"pendant"`
-	UID             runtime.Int           `json:"uid"`
+	UserInfoBasic  `json:",inline"`
+	Achieve        Achieve               `json:"achieve"`
+	Certifications []CertificationDetail `json:"certifications"`
+	CommunityInfo  MysInfo               `json:"community_info"`
+	Exps           []ExpStatus           `json:"level_exps"`
 }
 
 type Achieve struct {

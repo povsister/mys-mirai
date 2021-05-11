@@ -5,7 +5,7 @@ import (
 	"github.com/povsister/mys-mirai/mys/rest"
 )
 
-type UserInterface interface {
+type UserMngInterface interface {
 	Silence(uid int, opt meta.SilenceUserOptions) error
 	UnSilence(uid int, opt meta.UnSilenceUserOptions) error
 }

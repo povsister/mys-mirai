@@ -5,8 +5,15 @@ import (
 	"github.com/Mrs4s/MiraiGo/client"
 	"github.com/povsister/mys-mirai/mys"
 	"github.com/povsister/mys-mirai/pkg/log"
+	"github.com/povsister/mys-mirai/pkg/qqmsg"
 	"github.com/povsister/mys-mirai/pkg/util/fs"
 )
+
+var logger log.Logger
+
+func init() {
+	logger = log.SubLogger("bot")
+}
 
 // 由 event listener 实现
 type EventListener interface {
@@ -46,6 +53,20 @@ func (b *Bot) Q() *client.QQClient {
 
 func (b *Bot) M() *mys.UserManager {
 	return b.mys
+}
+
+// 从消息自动获取对应的 mys client
+func (b *Bot) MByMsg(m interface{}) *mys.Clientset {
+	uin := qqmsg.ExtractMsgSenderUin(m)
+	if uin == 0 {
+		return nil
+	}
+	ret := b.mys.Get(uin)
+	if ret == nil {
+		b.ReplyStr(m, "契约尚未签订喵~")
+		return nil
+	}
+	return ret
 }
 
 // 启动所有注册过的 event listener

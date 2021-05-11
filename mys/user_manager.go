@@ -81,6 +81,7 @@ func (m *UserManager) AddByNetscapeCookie(qid int64, cookie []byte, persistCooki
 	cks := fs.ParseNetscapeCookie(cookie)
 	if cks != nil {
 		config := rest.NewConfig(cks)
+		config.Qid = qid
 		m.mu.Lock()
 		defer m.mu.Unlock()
 		m.cs[qid] = NewClient(config)

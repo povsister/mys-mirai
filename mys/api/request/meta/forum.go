@@ -4,6 +4,7 @@ package meta
 type Forum uint32
 
 const (
+	NoForum    Forum = 0
 	YsTavern   Forum = 26
 	YsGuide    Forum = 43
 	YsDoujin   Forum = 29
@@ -13,6 +14,7 @@ const (
 )
 
 var forumsTable = map[Forum]string{
+	NoForum:    "无版块",
 	YsTavern:   "酒馆",
 	YsGuide:    "攻略",
 	YsDoujin:   "同人图",
@@ -29,11 +31,13 @@ func (ft Forum) Name() string {
 type Topic uint32
 
 const (
-	YsWaterSlime Topic = 180
+	YsWaterSlime    Topic = 180
+	YsFriendRecruit Topic = 289
 )
 
 var topicsTable = map[Topic]string{
-	YsWaterSlime: "水史莱姆聚集地",
+	YsWaterSlime:    "水史莱姆聚集地",
+	YsFriendRecruit: "好友招募",
 }
 
 func (tt Topic) Name() string {

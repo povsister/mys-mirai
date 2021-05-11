@@ -5,7 +5,8 @@ import (
 	"github.com/Mrs4s/MiraiGo/message"
 	"github.com/povsister/mys-mirai/bot"
 	"github.com/povsister/mys-mirai/event/basic"
-	"strings"
+	_ "github.com/povsister/mys-mirai/event/handler"
+	"github.com/povsister/mys-mirai/event/router"
 )
 
 var GroupMessageListener = &groupMessage{new(basic.BasicListener)}
@@ -19,15 +20,7 @@ type groupMessage struct {
 }
 
 func (gm *groupMessage) Start() {
-	gm.Bot.Q().OnGroupMessage(func(cli *client.QQClient, msg *message.GroupMessage) {
-		msgStr := msg.ToString()
-		if len(msgStr) == 0 {
-			return
-		}
-		if strings.Contains(msgStr, "Hello") {
-			msg.Sender.DisplayName()
-			reply := message.NewSendingMessage().Append(message.NewText("Hello " + msg.Sender.DisplayName()))
-			cli.SendGroupMessage(msg.GroupCode, reply)
-		}
+	gm.Bot.Q().OnGroupMessage(func(_ *client.QQClient, msg *message.GroupMessage) {
+		router.Router.HandleMessage(gm.Bot, msg)
 	})
 }
