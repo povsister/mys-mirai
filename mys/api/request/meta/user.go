@@ -49,7 +49,7 @@ func (usuo UnSilenceUserOptions) Apply(r *rest.Request) *rest.Request {
 }
 
 // 自己的uid 用于不填的默认行为
-const MySelfUser = 0
+const UserMyself = 0
 
 type UserInfoGetOptions struct {
 }

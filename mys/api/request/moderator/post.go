@@ -21,7 +21,8 @@ func newPostManger(c *ModeratorClient, gid rest.GameType) *postManger {
 }
 
 func (c *postManger) Delete(pid int, opt meta.DeletePostOptions) error {
-	return opt.Apply(c.client.Post()).
+	return c.client.Post().
+		Use(opt).
 		GID(c.gid).
 		Path("/post/wapi/deletePost").
 		BodyKV("post_id", pid).
@@ -29,7 +30,8 @@ func (c *postManger) Delete(pid int, opt meta.DeletePostOptions) error {
 }
 
 func (c *postManger) Move(pid int, opt meta.MovePostOptions) error {
-	return opt.Apply(c.client.Post()).
+	return c.client.Post().
+		Use(opt).
 		GID(c.gid).
 		Path("/post/wapi/movePost").
 		BodyKV("post_id", pid).
@@ -37,7 +39,8 @@ func (c *postManger) Move(pid int, opt meta.MovePostOptions) error {
 }
 
 func (c *postManger) RemoveTopic(pid int, opt meta.RemoveTopicOptions) error {
-	return opt.Apply(c.client.Post()).
+	return c.client.Post().
+		Use(opt).
 		GID(c.gid).
 		Path("/post/wapi/removePostTopicsByTopicIDs").
 		BodyKV("post_id", pid).

@@ -18,6 +18,7 @@
 .idea
 cmd/logs
 cmd/test
+cmd/cookies
 cmd/config.yaml
 resources/json/device.json
 resources/cookie/*

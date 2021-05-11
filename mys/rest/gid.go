@@ -3,7 +3,7 @@ package rest
 type GameType uint8
 
 const (
-	NoForum GameType = 0
+	NoGame  GameType = 0
 	Honkai3 GameType = 1
 	Genshin GameType = 2
 	Honkai2 GameType = 3

@@ -63,7 +63,7 @@ func (m *UserManager) scanEmbedUser() {
 					logger.Warn().Err(err).Msg("failed to read embed cookie")
 					continue
 				}
-				m.AddFromCookie(qid, cookie, false)
+				m.AddByNetscapeCookie(qid, cookie, false)
 			}
 		}
 	}
@@ -77,7 +77,7 @@ func parseQid(fName string) int64 {
 	return 0
 }
 
-func (m *UserManager) AddFromCookie(qid int64, cookie []byte, persistCookie bool) {
+func (m *UserManager) AddByNetscapeCookie(qid int64, cookie []byte, persistCookie bool) {
 	cks := fs.ParseNetscapeCookie(cookie)
 	if cks != nil {
 		config := rest.NewConfig(cks)
@@ -87,6 +87,7 @@ func (m *UserManager) AddFromCookie(qid int64, cookie []byte, persistCookie bool
 		if persistCookie {
 			m.persistCookie(qid, cks)
 		}
+		logger.Info().Int64("qid", qid).Msg("added mys client from persist cookie")
 	}
 }
 
@@ -130,7 +131,7 @@ func (m *UserManager) scanPersistUser() {
 			logger.Error().Err(err).Msg("can not read persist cookie")
 			continue
 		}
-		m.AddFromCookie(qid, data, false)
+		m.AddByNetscapeCookie(qid, data, false)
 	}
 }
 
@@ -161,7 +162,7 @@ func (m *UserManager) Get(qid int64) *Clientset {
 func (m *UserManager) TestCookie(ck []*http.Cookie) (*Clientset, error) {
 	config := rest.NewConfig(ck)
 	c := NewClient(config)
-	myInfo, err := c.User().Info(rest.NoForum).Get(meta.MySelfUser, meta.UserInfoGetOptions{})
+	myInfo, err := c.User().Info(rest.NoGame).Get(meta.UserMyself, meta.UserInfoGetOptions{})
 	if err != nil {
 		return nil, err
 	}

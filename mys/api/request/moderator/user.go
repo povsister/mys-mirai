@@ -20,7 +20,8 @@ func newUserManager(c *ModeratorClient, gid rest.GameType) *userManager {
 }
 
 func (c *userManager) Silence(uid int, opt meta.SilenceUserOptions) error {
-	return opt.Apply(c.client.Post()).
+	return c.client.Post().
+		Use(opt).
 		GID(c.gid).
 		Path("/user/wapi/silenceUser").
 		BodyKV("uid", uid).
@@ -28,7 +29,8 @@ func (c *userManager) Silence(uid int, opt meta.SilenceUserOptions) error {
 }
 
 func (c *userManager) UnSilence(uid int, opt meta.UnSilenceUserOptions) error {
-	return opt.Apply(c.client.Post()).
+	return c.client.Post().
+		Use(opt).
 		GID(c.gid).
 		Path("/user/wapi/unSilenceUser").
 		BodyKV("uid", uid).

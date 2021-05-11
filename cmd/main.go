@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/povsister/mys-mirai/bot"
 	"github.com/povsister/mys-mirai/config"
+	_ "github.com/povsister/mys-mirai/event"
 	"github.com/povsister/mys-mirai/pkg/log"
 	"github.com/povsister/mys-mirai/pkg/util"
 )

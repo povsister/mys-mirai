@@ -14,7 +14,7 @@ import (
 var logger log.Logger
 
 func init() {
-	logger = log.SubLogger("mys.rest")
+	logger = log.SubLogger("mys.restClient")
 }
 
 type bodyBuilder map[string]interface{}
@@ -45,6 +45,14 @@ type Request struct {
 
 	// error detained
 	err error
+}
+
+type RequestOptions interface {
+	Apply(r *Request) *Request
+}
+
+func (r *Request) Use(o RequestOptions) *Request {
+	return o.Apply(r)
 }
 
 func (r *Request) GID(id GameType) *Request {
@@ -101,19 +109,24 @@ func (r *Request) Do() *Result {
 	if r.err != nil {
 		return &Result{err: r.err}
 	}
+	thisID := r.c.NextRequestID()
+	// request logger
+	l := logger.Trace().Str("method", r.verb)
 
 	r.r.Method = r.verb
 	// set request body
 	if r.body != nil {
-		if r.gid != NoForum {
+		if r.gid != NoGame {
 			r.body.Set("gid", r.gid)
 		}
 		r.r.SetBody(r.body)
+		l.Interface("body", r.body)
 	}
 	// set request param
-	if len(r.params) > 0 && r.gid != NoForum {
+	if len(r.params) > 0 && r.gid != NoGame {
 		r.params.Set("gid", strconv.Itoa(int(r.gid)))
 		r.r.QueryParam = r.params
+		l.Str("query", r.r.QueryParam.Encode())
 	}
 	// compose request url
 	u := url.URL{
@@ -122,20 +135,29 @@ func (r *Request) Do() *Result {
 		Path:   r.c.base.Path + strings.TrimLeft(r.path, "/"),
 	}
 	r.r.URL = u.String()
+	l.Str("url", r.r.URL)
 	// set additional headers if any
 	if r.headers != nil {
 		r.r.SetHeaders(r.headers)
+		l.Interface("header", r.headers)
 	}
-	// send out the request
+	// send out the request and logger
+	l.Uint64("request_id", thisID).Msg("request sent")
 	resp, err := r.r.Send()
 	if err != nil {
+		logger.Trace().Uint64("request_id", thisID).Err(err).
+			Msg("request sending error")
 		return &Result{resp: resp, err: err}
 	}
-	return r.transformResponse(resp)
+	return r.transformResponse(thisID, resp)
 }
 
-func (r *Request) transformResponse(resp *resty.Response) *Result {
+func (r *Request) transformResponse(rid uint64, resp *resty.Response) *Result {
 	decoder := runtime.NegotiateDecoder(resp.Header().Get("Content-Type"))
+	body := resp.Body()
+	logger.Trace().Uint64("request_id", rid).
+		Bytes("body", body).Int("status", resp.StatusCode()).
+		Msgf("%s response received", resp.Status())
 	return &Result{resp: resp, body: resp.Body(), decoder: decoder}
 }
 
@@ -147,6 +169,8 @@ type Result struct {
 	decoder runtime.Decoder
 }
 
+// 只返回 runtime error. 不检查 application error.
+// 例如 对于 retcode != 0 的情况不做检查
 func (r *Result) Into(obj runtime.Object) error {
 	if r.err != nil {
 		return r.err
@@ -166,6 +190,9 @@ func (r *Result) Into(obj runtime.Object) error {
 	return nil
 }
 
+// 优先返回 runtime error.
+// 其次检查 application level error.
+// 例如 对于 retcode != 0 的响应, 返回 retcode: message 作为错误信息
 func (r *Result) Error() error {
 	if len(r.body) == 0 || r.decoder == nil {
 		return r.err

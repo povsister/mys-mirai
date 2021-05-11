@@ -3,13 +3,15 @@ package bot
 import (
 	"fmt"
 	"github.com/Mrs4s/MiraiGo/client"
+	"github.com/povsister/mys-mirai/mys"
 	"github.com/povsister/mys-mirai/pkg/log"
 	"github.com/povsister/mys-mirai/pkg/util/fs"
 )
 
 // 由 event listener 实现
 type EventListener interface {
-	Register(client *client.QQClient)
+	Register(c *Bot)
+	Start()
 }
 
 // 所有注册过的event listener
@@ -22,8 +24,9 @@ func RegisterEvent(e EventListener) {
 
 // bot
 type Bot struct {
-	c  *client.QQClient
-	lm *loginManger
+	c   *client.QQClient
+	lm  *loginManger
+	mys *mys.UserManager
 }
 
 func NewBot(uid int64, pw string) *Bot {
@@ -33,13 +36,23 @@ func NewBot(uid int64, pw string) *Bot {
 	b.c = client.NewClient(uid, pw)
 	b.setupLogHandler()
 	b.handleServerUpdated()
+	b.mys = mys.NewUserManager()
 	return b
+}
+
+func (b *Bot) Q() *client.QQClient {
+	return b.c
+}
+
+func (b *Bot) M() *mys.UserManager {
+	return b.mys
 }
 
 // 启动所有注册过的 event listener
 func (b *Bot) registerKnownEvents() {
 	for _, e := range registeredListener {
-		e.Register(b.c)
+		e.Register(b)
+		e.Start()
 	}
 }
 

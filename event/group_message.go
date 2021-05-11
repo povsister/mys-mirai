@@ -4,20 +4,22 @@ import (
 	"github.com/Mrs4s/MiraiGo/client"
 	"github.com/Mrs4s/MiraiGo/message"
 	"github.com/povsister/mys-mirai/bot"
+	"github.com/povsister/mys-mirai/event/basic"
 	"strings"
 )
 
-var GroupMessageListener = new(groupMessage)
+var GroupMessageListener = &groupMessage{new(basic.BasicListener)}
 
 func init() {
 	bot.RegisterEvent(GroupMessageListener)
 }
 
 type groupMessage struct {
+	*basic.BasicListener
 }
 
-func (m *groupMessage) Register(c *client.QQClient) {
-	c.OnGroupMessage(func(cli *client.QQClient, msg *message.GroupMessage) {
+func (gm *groupMessage) Start() {
+	gm.Bot.Q().OnGroupMessage(func(cli *client.QQClient, msg *message.GroupMessage) {
 		msgStr := msg.ToString()
 		if len(msgStr) == 0 {
 			return

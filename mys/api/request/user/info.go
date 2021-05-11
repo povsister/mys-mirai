@@ -4,6 +4,7 @@ import (
 	"github.com/povsister/mys-mirai/mys/api/request/meta"
 	"github.com/povsister/mys-mirai/mys/api/response/user"
 	"github.com/povsister/mys-mirai/mys/rest"
+	"strconv"
 )
 
 type UserInfoInterface interface {
@@ -21,9 +22,13 @@ func newUserInfoManager(c rest.Interface, gid rest.GameType) *userInfoManager {
 
 func (c *userInfoManager) Get(uid int, opt meta.UserInfoGetOptions) (ret *user.FullUserInfo, err error) {
 	ret = &user.FullUserInfo{}
-	err = opt.Apply(c.client.Get()).
+	req := c.client.Get().
+		Use(opt).
 		GID(c.gid).
-		Path("/user/wapi/getUserFullInfo").
-		Do().Into(ret)
+		Path("/user/wapi/getUserFullInfo")
+	if uid != meta.UserMyself {
+		req.ParamSet("uid", strconv.Itoa(uid))
+	}
+	err = req.Do().Into(ret)
 	return
 }

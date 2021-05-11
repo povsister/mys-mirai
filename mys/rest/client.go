@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -27,8 +28,9 @@ type Interface interface {
 }
 
 type RESTClient struct {
-	base url.URL
-	c    *resty.Client
+	counter uint64
+	base    url.URL
+	c       *resty.Client
 }
 
 type Config struct {
@@ -112,4 +114,9 @@ func dsGenerator(req *resty.Request) {
 	hash := md5.Sum(bytes.Join(vals, []byte("&")))
 	ds := now + "," + string(rev) + "," + fmt.Sprintf("%x", hash)
 	req.SetHeader("DS", ds)
+}
+
+// return the next request ID. Auto incremental.
+func (c *RESTClient) NextRequestID() uint64 {
+	return atomic.AddUint64(&c.counter, 1)
 }
