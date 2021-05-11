@@ -44,6 +44,8 @@ func NewConfig(ck []*http.Cookie) *Config {
 func NewRESTClient(base url.URL, cfg *Config) *RESTClient {
 	c := resty.New()
 	c.SetRetryCount(1)
+	c.SetTimeout(5 * time.Second)
+
 	if len(cfg.Cookie) > 0 {
 		c.SetCookies(cfg.Cookie)
 	}
