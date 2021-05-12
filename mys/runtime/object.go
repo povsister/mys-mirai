@@ -96,6 +96,8 @@ type (
 func init() {
 	jsoniter.RegisterTypeDecoder("runtime.Int", NumberCodec)
 	jsoniter.RegisterTypeEncoder("runtime.Int", NumberCodec)
+	jsoniter.RegisterTypeDecoder("runtime.UnixTimestamp", NumberCodec)
+	jsoniter.RegisterTypeEncoder("runtime.UnixTimestamp", NumberCodec)
 }
 
 func (n Int) Int() int {

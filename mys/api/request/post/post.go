@@ -9,7 +9,7 @@ import (
 )
 
 type PostInterface interface {
-	Get(pid int, opt meta.GetPostOptions) (*post.FullPostInfo, error)
+	Get(pid int, opt meta.GetPostOptions) (*post.FullPostInfoResponse, error)
 }
 
 type postImpl struct {
@@ -21,8 +21,8 @@ func newPostImpl(c rest.Interface, gid rest.GameType) *postImpl {
 	return &postImpl{client: c, gid: gid}
 }
 
-func (c *postImpl) Get(pid int, opt meta.GetPostOptions) (ret *post.FullPostInfo, err error) {
-	ret = &post.FullPostInfo{}
+func (c *postImpl) Get(pid int, opt meta.GetPostOptions) (ret *post.FullPostInfoResponse, err error) {
+	ret = &post.FullPostInfoResponse{}
 	err = c.client.Get().
 		Use(opt).
 		GID(c.gid).

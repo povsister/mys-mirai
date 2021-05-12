@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	FullPostInfo struct {
+	FullPostInfoResponse struct {
 		runtime.ObjectMeta `json:",inline"`
 		FullPostInfoData   `json:"data"`
 	}
