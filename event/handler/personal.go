@@ -2,6 +2,8 @@ package handler
 
 import (
 	"bytes"
+	"strings"
+
 	"github.com/povsister/mys-mirai/bot"
 	"github.com/povsister/mys-mirai/event/router"
 	"github.com/povsister/mys-mirai/mys/api/request/meta"
@@ -36,16 +38,19 @@ func handlePersonalInfo(b *bot.Bot, m interface{}, _ router.Params) {
 	b.SendOrReplyStrByMsg(m, useTemplate(personalInfo, info))
 }
 
+func cmdToHelpMsg(hs map[string]handlerDetail) (ret []string) {
+	for cmd, h := range hs {
+		ret = append(ret, "< "+cmd+" >  "+h.Descr)
+	}
+	return
+}
+
 func handleHelp(b *bot.Bot, m interface{}, _ router.Params) {
 	buf := new(bytes.Buffer)
 	buf.WriteString("喵~\n")
-	for cmd, h := range moderatorHandlers {
-		buf.WriteString(cmd + "  " + h.Descr + "\n")
-	}
+	buf.WriteString(strings.Join(cmdToHelpMsg(moderatorHandlers), "\n"))
 	buf.WriteString("\n")
-	for cmd, h := range personalHandlers {
-		buf.WriteString(cmd + "  " + h.Descr + "\n")
-	}
+	buf.WriteString(strings.Join(cmdToHelpMsg(personalHandlers), "\n"))
 
 	b.SendStrByMsg(m, buf.String())
 }

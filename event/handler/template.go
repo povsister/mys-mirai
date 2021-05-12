@@ -15,7 +15,7 @@ func useTemplate(t *template.Template, obj interface{}) string {
 	buf := new(bytes.Buffer)
 	err := t.Execute(buf, obj)
 	if err != nil {
-		return "主人写错东西了喵~\n" + err.Error()
+		return "铲屎官好像写错东西了喵~\n" + err.Error()
 	}
 	return buf.String()
 }
