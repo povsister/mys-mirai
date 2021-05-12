@@ -3,7 +3,6 @@ package rest
 import (
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -124,7 +123,7 @@ func (r *Request) Do() *Result {
 	}
 	// set request param
 	if len(r.params) > 0 && r.gid != NoGame {
-		r.params.Set("gid", strconv.Itoa(int(r.gid)))
+		r.params.Set("gid", string(r.gid))
 		r.r.QueryParam = r.params
 		l.Str("query", r.r.QueryParam.Encode())
 	}

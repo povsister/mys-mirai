@@ -27,7 +27,7 @@ func (suo SilenceUserOptions) Apply(r *rest.Request) *rest.Request {
 	var fs []map[string]int
 	for _, per := range suo.SilenceForum {
 		fs = append(fs, map[string]int{
-			"forum_id":              int(per.ID),
+			"forum_id":              per.ID.Int(),
 			"forum_silent_duration": int(per.Duration.Seconds()),
 		})
 	}

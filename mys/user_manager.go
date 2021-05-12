@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/povsister/mys-mirai/mys/api/request/meta"
+	"github.com/povsister/mys-mirai/mys/api/meta"
 	"github.com/povsister/mys-mirai/mys/rest"
 	"github.com/povsister/mys-mirai/mys/runtime"
 	"github.com/povsister/mys-mirai/pkg/log"

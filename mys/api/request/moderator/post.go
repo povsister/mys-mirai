@@ -1,7 +1,7 @@
 package moderator
 
 import (
-	"github.com/povsister/mys-mirai/mys/api/request/meta"
+	"github.com/povsister/mys-mirai/mys/api/meta"
 	"github.com/povsister/mys-mirai/mys/rest"
 )
 

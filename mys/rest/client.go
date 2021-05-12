@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type Interface interface {
@@ -44,9 +45,10 @@ func NewConfig(ck []*http.Cookie) *Config {
 
 func NewRESTClient(base url.URL, cfg *Config) *RESTClient {
 	c := resty.New()
+	c.JSONMarshal = jsoniter.Marshal
+	c.JSONUnmarshal = jsoniter.Unmarshal
 	c.SetRetryCount(1)
 	c.SetTimeout(5 * time.Second)
-
 	if len(cfg.Cookie) > 0 {
 		c.SetCookies(cfg.Cookie)
 	}

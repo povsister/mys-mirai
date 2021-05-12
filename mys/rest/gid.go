@@ -1,14 +1,24 @@
 package rest
 
-type GameType uint8
+import (
+	jsoniter "github.com/json-iterator/go"
+	"github.com/povsister/mys-mirai/mys/runtime"
+)
+
+func init() {
+	jsoniter.RegisterTypeEncoder("rest.GameType", runtime.NumberCodec)
+	jsoniter.RegisterTypeDecoder("rest.GameType", runtime.NumberCodec)
+}
+
+type GameType jsoniter.Number
 
 const (
-	NoGame  GameType = 0
-	Honkai3 GameType = 1
-	Genshin GameType = 2
-	Honkai2 GameType = 3
-	WeiDing GameType = 4
-	DaBieYe GameType = 5
+	NoGame  GameType = "0"
+	Honkai3 GameType = "1"
+	Genshin GameType = "2"
+	Honkai2 GameType = "3"
+	WeiDing GameType = "4"
+	DaBieYe GameType = "5"
 )
 
 type gidDetail struct {

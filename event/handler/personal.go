@@ -6,7 +6,7 @@ import (
 
 	"github.com/povsister/mys-mirai/bot"
 	"github.com/povsister/mys-mirai/event/router"
-	"github.com/povsister/mys-mirai/mys/api/request/meta"
+	"github.com/povsister/mys-mirai/mys/api/meta"
 	"github.com/povsister/mys-mirai/mys/rest"
 )
 

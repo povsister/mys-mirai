@@ -1,8 +1,9 @@
 package meta
 
 import (
-	"github.com/povsister/mys-mirai/mys/rest"
 	"regexp"
+
+	"github.com/povsister/mys-mirai/mys/rest"
 )
 
 type DeleteReason uint8

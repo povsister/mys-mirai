@@ -1,10 +1,11 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/povsister/mys-mirai/bot"
 	"github.com/povsister/mys-mirai/event/router"
-	"github.com/povsister/mys-mirai/mys/api/request/meta"
-	"time"
+	"github.com/povsister/mys-mirai/mys/api/meta"
 )
 
 type handlerDetail struct {

@@ -1,10 +1,11 @@
 package post
 
 import (
-	"github.com/povsister/mys-mirai/mys/api/request/meta"
+	"strconv"
+
+	"github.com/povsister/mys-mirai/mys/api/meta"
 	"github.com/povsister/mys-mirai/mys/api/response/post"
 	"github.com/povsister/mys-mirai/mys/rest"
-	"strconv"
 )
 
 type PostInterface interface {
