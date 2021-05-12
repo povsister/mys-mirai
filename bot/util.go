@@ -1,11 +1,12 @@
 package bot
 
 import (
-	"github.com/Mrs4s/MiraiGo/message"
-	"github.com/povsister/mys-mirai/mys/rest"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/Mrs4s/MiraiGo/message"
+	"github.com/povsister/mys-mirai/mys/rest"
 )
 
 func IsPrivateMsg(m interface{}) bool {
@@ -52,26 +53,28 @@ func ExtractMsgSenderUin(m interface{}) int64 {
 	return 0
 }
 
-func toString(e message.IMessageElement, force bool) (ret string) {
+func toString(e message.IMessageElement, force bool) string {
 	t := e.Type()
-	if t != message.Text && t != message.Reply && !force {
-		return
+	if t != message.Text && t != message.Reply && t != message.LightApp && !force {
+		return ""
 	}
 	switch em := e.(type) {
 	case *message.TextElement:
-		ret = em.Content
+		return em.Content
 	case *message.ReplyElement:
-		strs := make([]string, len(em.Elements))
+		strs := make([]string, 0, len(em.Elements))
 		for _, im := range em.Elements {
 			strs = append(strs, toString(im, force))
 		}
-		ret = strings.Join(strs, " ")
+		return strings.Join(strs, " ")
+	case *message.LightAppElement:
+		return em.Content
 	default:
 		if s, ok := e.(MessageStringer); ok {
-			ret = s.ToString()
+			return s.ToString()
 		}
 	}
-	return
+	return ""
 }
 
 var postIdRgx = regexp.MustCompile(".*bbs\\.mihoyo\\.com/([a-z0-9]{2,3}).*article/([1-9][0-9]*).*")

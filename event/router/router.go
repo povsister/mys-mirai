@@ -9,11 +9,13 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/povsister/mys-mirai/bot"
-	"github.com/povsister/mys-mirai/pkg/log"
 	"io"
 	"strings"
 	"sync"
+
+	"github.com/Mrs4s/MiraiGo/message"
+	"github.com/povsister/mys-mirai/bot"
+	"github.com/povsister/mys-mirai/pkg/log"
 )
 
 var (
@@ -141,9 +143,27 @@ func readCommandToken(msgByte, text []byte) string {
 	return string(bytes.Trim(path, " \r\n"))
 }
 
+func containLightAppElem(m interface{}) bool {
+	var elems []message.IMessageElement
+	switch tm := m.(type) {
+	case *message.PrivateMessage:
+		elems = tm.Elements
+	case *message.GroupMessage:
+		elems = tm.Elements
+	default:
+		return false
+	}
+	for _, e := range elems {
+		if _, ok := e.(*message.LightAppElement); ok {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *router) HandleMessage(b *bot.Bot, m bot.MessageStringer) {
 	msgByte := []byte(m.ToString())
-	if len(msgByte) == 0 {
+	if len(msgByte) == 0 && !containLightAppElem(m) {
 		return
 	}
 	b.RecordMessage(m)
