@@ -23,22 +23,21 @@ type (
 
 type (
 	PostInfo struct {
-		Collection       PostCollection        `json:"collection"`
-		Cover            Cover                 `json:"cover"`
-		Forum            forum.ForumInfoBasic  `json:"forum"`
-		User             user.UserInfoBasic    `json:"user"`
-		MyOperation      SelfOperation         `json:"self_operation"`
-		Stat             PostStat              `json:"stat"`
-		TopicList        []TopicDetail         `json:"topics"`
-		Detail           PostContent           `json:"post"`
-		ImageList        []Image               `json:"image_list"`
-		VodList          []VodObject           `json:"vod_list"`
-		VoteCount        int                   `json:"vote_count"`
-		IsBlockOn        bool                  `json:"is_block_on"`
-		IsOfficialMaster bool                  `json:"is_official_master"`
-		IsUserMaster     bool                  `json:"is_user_master"`
-		HasHotReplies    bool                  `json:"has_hot_replies"`
-		LastModifiedAt   runtime.UnixTimestamp `json:"last_modify_time"`
+		Collection     PostCollection       `json:"collection"`
+		Cover          Cover                `json:"cover"`
+		Forum          forum.ForumInfoBasic `json:"forum"`
+		User           user.UserInfoBasic   `json:"user"`
+		MyOperation    SelfOperation        `json:"self_operation"`
+		Stat           PostStat             `json:"stat"`
+		TopicList      []TopicDetail        `json:"topics"`
+		Detail         PostContent          `json:"post"`
+		ImageList      []Image              `json:"image_list"`
+		VodList        []VodObject          `json:"vod_list"`
+		VoteCount      int                  `json:"vote_count"`
+		IsBlockOn      bool                 `json:"is_block_on"`
+		MasterStatus   `json:",inline"`
+		HasHotReplies  bool                  `json:"has_hot_replies"`
+		LastModifiedAt runtime.UnixTimestamp `json:"last_modify_time"`
 	}
 
 	PostStat struct {
@@ -46,6 +45,11 @@ type (
 		Likes     int `json:"like_num"`
 		Replies   int `json:"reply_num"`
 		Views     int `json:"view_num"`
+	}
+
+	MasterStatus struct {
+		IsOfficialMaster bool `json:"is_official_master"`
+		IsUserMaster     bool `json:"is_user_master"`
 	}
 )
 
