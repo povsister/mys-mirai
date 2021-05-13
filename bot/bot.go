@@ -34,7 +34,7 @@ type Bot struct {
 	c        *client.QQClient
 	lm       *loginManger
 	mys      *mys.UserManager
-	msgCache *lru.ARCCache
+	msgCache *lru.TwoQueueCache
 }
 
 func NewBot(uid int64, pw string) *Bot {
@@ -45,7 +45,9 @@ func NewBot(uid int64, pw string) *Bot {
 	b.setupLogHandler()
 	b.handleServerUpdated()
 	b.mys = mys.NewUserManager()
-	lruc, err := lru.NewARC(5000)
+	// 缓存10000条消息. 其中只有500条会被提升到经常使用的消息.
+	// 并且记录1000条最近淘汰消息
+	lruc, err := lru.New2QParams(10000, 0.95, 0.1)
 	if err != nil {
 		log.Warn().Err(err).Msg("缓存初始化失败 将无法正常记录历史消息")
 	} else {
