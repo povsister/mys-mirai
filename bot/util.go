@@ -18,39 +18,42 @@ type MessageStringer interface {
 	ToString() string
 }
 
-func ExtractLastTextElement(m MessageStringer) *message.TextElement {
-	switch msg := m.(type) {
-	case *message.GroupMessage:
-		for i := len(msg.Elements) - 1; i >= 0; i-- {
-			if msg.Elements[i].Type() != message.Text {
-				continue
+func ExtractLastTextElement(m MessageStringer) (ret *message.TextElement) {
+	DispatchMessage(m, DispatchTo{
+		From: "bot.ExtractLastTextElement",
+		Group: func(gm *message.GroupMessage) {
+			for i := len(gm.Elements) - 1; i >= 0; i-- {
+				if gm.Elements[i].Type() != message.Text {
+					continue
+				}
+				ret = gm.Elements[i].(*message.TextElement)
+				break
 			}
-			return msg.Elements[i].(*message.TextElement)
-		}
-	case *message.PrivateMessage:
-		for i := len(msg.Elements) - 1; i >= 0; i-- {
-			if msg.Elements[i].Type() != message.Text {
-				continue
+		},
+		Private: func(pm *message.PrivateMessage) {
+			for i := len(pm.Elements) - 1; i >= 0; i-- {
+				if pm.Elements[i].Type() != message.Text {
+					continue
+				}
+				ret = pm.Elements[i].(*message.TextElement)
+				break
 			}
-			return msg.Elements[i].(*message.TextElement)
-		}
-	default:
-		logger.Error().Str("msg", m.ToString()).
-			Msgf("can not handle message. unknown message type %T", m)
-	}
-	return nil
+		},
+	})
+	return
 }
 
-func ExtractMsgSenderUin(m interface{}) int64 {
-	switch msg := m.(type) {
-	case *message.GroupMessage:
-		return msg.Sender.Uin
-	case *message.PrivateMessage:
-		return msg.Sender.Uin
-	default:
-		logger.Error().Msgf("can not extract uin. unknown message type %T", m)
-	}
-	return 0
+func ExtractMsgSenderUin(m interface{}) (uin int64) {
+	DispatchMessage(m, DispatchTo{
+		From: "bot.ExtractMsgSenderUin",
+		Group: func(gm *message.GroupMessage) {
+			uin = gm.Sender.Uin
+		},
+		Private: func(pm *message.PrivateMessage) {
+			uin = pm.Sender.Uin
+		},
+	})
+	return
 }
 
 func toString(e message.IMessageElement, force bool) string {
@@ -127,4 +130,39 @@ func (b *Bot) ExtractMysPostID(m interface{}) (rest.GameType, int) {
 		logger.Error().Msgf("can not extract uin. unknown message type %T", m)
 	}
 	return rest.NoGame, 0
+}
+
+type DispatchTo struct {
+	// debug message.
+	// indicate where the message from
+	From string
+	// GroupMessage callback
+	Group func(gm *message.GroupMessage)
+	// PrivateMessage callback
+	Private func(pm *message.PrivateMessage)
+	// Unknown type message callback
+	Default func(m interface{})
+}
+
+func DispatchMessage(m interface{}, o DispatchTo) {
+	switch typedMsg := m.(type) {
+	case *message.GroupMessage:
+		if o.Group != nil {
+			o.Group(typedMsg)
+		}
+	case *message.PrivateMessage:
+		if o.Private != nil {
+			o.Private(typedMsg)
+		}
+	default:
+		if o.Default != nil {
+			o.Default(m)
+		} else {
+			l := logger.Error()
+			if len(o.From) > 0 {
+				l.Str("requested_by", o.From)
+			}
+			l.Msgf("can not dispatch message. unknown message type %T", m)
+		}
+	}
 }

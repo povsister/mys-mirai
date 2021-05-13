@@ -5,14 +5,15 @@ import (
 )
 
 func (b *Bot) ReplyStr(m interface{}, reply string) {
-	switch msg := m.(type) {
-	case *message.GroupMessage:
-		b.replyGroupMsg(msg, reply)
-	case *message.PrivateMessage:
-		b.replyPrivateMsg(msg, reply)
-	default:
-		logger.Error().Str("msg", reply).Msgf("can not reply message. unknown message type %T", m)
-	}
+	DispatchMessage(m, DispatchTo{
+		From: "bot.ReplyStr",
+		Group: func(gm *message.GroupMessage) {
+			b.replyGroupMsg(gm, reply)
+		},
+		Private: func(pm *message.PrivateMessage) {
+			b.replyPrivateMsg(pm, reply)
+		},
+	})
 }
 
 func (b *Bot) replyGroupMsg(m *message.GroupMessage, reply string) {
@@ -30,14 +31,15 @@ func (b *Bot) replyPrivateMsg(m *message.PrivateMessage, reply string) {
 }
 
 func (b *Bot) SendStrByMsg(m interface{}, toSend string) {
-	switch msg := m.(type) {
-	case *message.GroupMessage:
-		b.sendGroupMsg(msg.GroupCode, toSend)
-	case *message.PrivateMessage:
-		b.sendPrivateMsg(msg.Sender.Uin, toSend)
-	default:
-		logger.Error().Str("msg", toSend).Msgf("can not send message by msg. unknown message type %T", m)
-	}
+	DispatchMessage(m, DispatchTo{
+		From: "bot.SendStrByMsg",
+		Group: func(gm *message.GroupMessage) {
+			b.sendGroupMsg(gm.GroupCode, toSend)
+		},
+		Private: func(pm *message.PrivateMessage) {
+			b.sendPrivateMsg(pm.Sender.Uin, toSend)
+		},
+	})
 }
 
 func (b *Bot) sendGroupMsg(groupCode int64, send string) {

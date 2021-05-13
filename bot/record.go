@@ -9,14 +9,15 @@ func (b *Bot) RecordMessage(m interface{}) {
 	if b.msgCache == nil {
 		return
 	}
-	switch msg := m.(type) {
-	case *message.GroupMessage:
-		b.recordGroupMsg(msg)
-	case *message.PrivateMessage:
-		b.recordPrivateMsg(msg)
-	default:
-		logger.Error().Msgf("can not cache msg. unknown message type %T", m)
-	}
+	DispatchMessage(m, DispatchTo{
+		From: "bot.RecordMessage",
+		Group: func(gm *message.GroupMessage) {
+			b.recordGroupMsg(gm)
+		},
+		Private: func(pm *message.PrivateMessage) {
+			b.recordPrivateMsg(pm)
+		},
+	})
 }
 
 func (b *Bot) recordGroupMsg(m *message.GroupMessage) {
