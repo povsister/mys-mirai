@@ -7,6 +7,7 @@ import (
 )
 
 type (
+	// /user/wapi/getUserFullInfo?gids=2
 	FullUserInfoResponse struct {
 		runtime.ObjectMeta `json:",inline"`
 		FullUserInfoData   `json:"data"`

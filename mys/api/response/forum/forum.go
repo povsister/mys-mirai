@@ -31,7 +31,7 @@ type (
 
 	ForumInfoBasic struct {
 		ID      meta.Forum    `json:"id"`
-		Gid     rest.GameType `json:"game_id"`
+		GID     rest.GameType `json:"game_id"`
 		IconURL string        `json:"icon"`
 		Name    string        `json:"name"`
 	}

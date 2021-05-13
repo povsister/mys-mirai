@@ -70,11 +70,9 @@ func GuessDeleteReason(s string) (ret DeleteReason) {
 	return
 }
 
-type TopicList []Topic
-
 type MovePostOptions struct {
 	To         Forum
-	WithTopics TopicList
+	WithTopics []Topic
 }
 
 func (mpo MovePostOptions) Apply(r *rest.Request) *rest.Request {
@@ -86,7 +84,7 @@ func (mpo MovePostOptions) Apply(r *rest.Request) *rest.Request {
 }
 
 type RemoveTopicOptions struct {
-	Remove TopicList
+	Remove []Topic
 }
 
 func (rto RemoveTopicOptions) Apply(r *rest.Request) *rest.Request {

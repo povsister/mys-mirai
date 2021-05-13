@@ -3,6 +3,8 @@ package runtime
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -112,8 +114,15 @@ func (n Int) Int() int {
 func (ut UnixTimestamp) Time() time.Time {
 	num, err := jsoniter.Number(ut).Int64()
 	if err != nil {
-		logger.Error().Err(err).Msgf("can not parse unixtimestamp from %q", string(ut))
-		return time.Unix(0, 0)
+		jsNum := jsoniter.Number(ut)
+		spit := strings.Split(jsNum.String(), ".")
+		if len(spit) != 2 {
+			logger.Error().Err(err).Msgf("can not parse unixtimestamp %q", string(ut))
+			return time.Unix(0, 0)
+		}
+		numSec, _ := strconv.ParseInt(spit[0], 64, 10)
+		numAftDot, _ := strconv.ParseInt(spit[1], 64, 10)
+		return time.Unix(numSec, numAftDot)
 	}
 	return time.Unix(num, 0)
 }
