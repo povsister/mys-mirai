@@ -13,3 +13,7 @@ func NewPostClient(c rest.Interface) *PostClient {
 func (c *PostClient) Info(gid rest.GameType) PostInterface {
 	return newPostImpl(c.restClient, gid)
 }
+
+func (c *PostClient) Reply(gid rest.GameType) PostReplyInterface {
+	return newPostReplyImpl(c.restClient, gid)
+}

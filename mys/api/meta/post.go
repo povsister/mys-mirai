@@ -2,6 +2,7 @@ package meta
 
 import (
 	"regexp"
+	"strconv"
 
 	"github.com/povsister/mys-mirai/mys/rest"
 )
@@ -96,5 +97,37 @@ type GetPostOptions struct {
 }
 
 func (gpo GetPostOptions) Apply(r *rest.Request) *rest.Request {
+	return r
+}
+
+type ListOrder uint8
+
+const (
+	// default
+	None ListOrder = 0
+	// 最早
+	Asc ListOrder = 1
+	// 最新
+	Desc ListOrder = 2
+)
+
+type ListReplyOptions struct {
+	Size      int
+	IsHot     bool
+	OrderType ListOrder
+}
+
+func (lro ListReplyOptions) Apply(r *rest.Request) *rest.Request {
+	r.ParamSet("is_hot", "true")
+	r.ParamSet("size", "20")
+	if !lro.IsHot {
+		r.ParamSet("is_hot", "false")
+	}
+	if lro.Size != 0 {
+		r.ParamSet("size", strconv.Itoa(lro.Size))
+	}
+	if lro.OrderType != None {
+		r.ParamSet("order_type", strconv.Itoa(int(lro.OrderType)))
+	}
 	return r
 }
