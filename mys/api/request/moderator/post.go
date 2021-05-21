@@ -9,6 +9,7 @@ type PostMngInterface interface {
 	Delete(pid int, opt meta.DeletePostOptions) error
 	Move(pid int, opt meta.MovePostOptions) error
 	RemoveTopic(pid int, opt meta.RemoveTopicOptions) error
+	DeleteReply(pid int, opt meta.DeleteReplyOptions) error
 }
 
 type postManger struct {
@@ -43,6 +44,15 @@ func (c *postManger) RemoveTopic(pid int, opt meta.RemoveTopicOptions) error {
 		Use(opt).
 		GID(c.gid).
 		Path("/post/wapi/removePostTopicsByTopicIDs").
+		BodyKV("post_id", pid).
+		Do().Error()
+}
+
+func (c *postManger) DeleteReply(pid int, opt meta.DeleteReplyOptions) error {
+	return c.client.Post().
+		Use(opt).
+		GID(c.gid).
+		Path("/post/wapi/deleteReply").
 		BodyKV("post_id", pid).
 		Do().Error()
 }

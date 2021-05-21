@@ -116,14 +116,14 @@ func (r *Request) Do() *Result {
 	// set request body
 	if r.body != nil {
 		if r.gid != NoGame {
-			r.body.Set("gid", r.gid)
+			r.body.Set("gids", r.gid)
 		}
 		r.r.SetBody(r.body)
 		l.Interface("body", r.body)
 	}
 	// set request param
 	if len(r.params) > 0 && r.gid != NoGame {
-		r.params.Set("gid", string(r.gid))
+		r.params.Set("gids", string(r.gid))
 		r.r.QueryParam = r.params
 		l.Str("query", r.r.QueryParam.Encode())
 	}

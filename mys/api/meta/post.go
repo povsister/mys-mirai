@@ -131,3 +131,11 @@ func (lro ListReplyOptions) Apply(r *rest.Request) *rest.Request {
 	}
 	return r
 }
+
+type DeleteReplyOptions struct {
+	ReplyID int
+}
+
+func (dro DeleteReplyOptions) Apply(r *rest.Request) *rest.Request {
+	return r.BodyKV("reply_id", dro.ReplyID)
+}
