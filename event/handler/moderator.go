@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/povsister/mys-mirai/bot"
@@ -19,6 +20,7 @@ var moderatorHandlers = map[string]handlerDetail{
 	"/移水":                      {"快速移动至水史莱姆聚集地", handleWaterPostMove},
 	"/招募":                      {"快速移动至好友招募区", handleFriendRecruit},
 	"/删帖/:reason/禁言/:duration": {"删帖并禁言，例如 /删帖/色图/禁言/72h", handleDeleteAndMute},
+	"/删楼/:floor":               {"删除指定楼层", handleReplyDelete},
 }
 
 func init() {
@@ -123,4 +125,27 @@ func handleDeleteAndMute(b *bot.Bot, m interface{}, ps router.Params) {
 
 func handleFriendRecruit(b *bot.Bot, m interface{}, _ router.Params) {
 	movePost(b, m, meta.NoForum, meta.YsFriendRecruit)
+}
+
+func handleReplyDelete(b *bot.Bot, m interface{}, ps router.Params) {
+	if len(ps.ByName("floor")) == 0 {
+		b.ReplyStr(m, "需要指定删除楼层喵~")
+		return
+	}
+	floor, err := strconv.Atoi(ps.ByName("floor"))
+	if err != nil {
+		b.ReplyStr(m, runtimeErr(err))
+		return
+	}
+	mys := b.MByMsg(m)
+	if mys == nil {
+		return
+	}
+	gid, pid := b.ExtractMysPostID(m)
+	if pid == 0 {
+		b.ReplyStr(m, errNoPidFound)
+		return
+	}
+	// TODO: get reply by floor
+	//mys.Post().Reply(gid).List(pid, meta.ListReplyOptions{})
 }
