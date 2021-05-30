@@ -7,6 +7,7 @@ import (
 
 	"github.com/Mrs4s/MiraiGo/message"
 	"github.com/povsister/mys-mirai/mys/rest"
+	"github.com/povsister/mys-mirai/mys/runtime"
 )
 
 func IsPrivateMsg(m interface{}) bool {
@@ -80,7 +81,7 @@ func toString(e message.IMessageElement, force bool) string {
 	return ""
 }
 
-var postIdRgx = regexp.MustCompile(".*bbs\\.mihoyo\\.com/([a-z0-9]{2,3}).*article/([1-9][0-9]*).*")
+var postIdRgx = regexp.MustCompile(".*bbs\\.mihoyo\\.com[\\\\]{0,2}/([a-z0-9]{2,3}).*article[\\\\]{0,2}/([1-9][0-9]*).*")
 
 func extractMysPostIdFromElems(es []message.IMessageElement) (rest.GameType, int) {
 	for _, e := range es {
@@ -95,6 +96,42 @@ func extractMysPostIdFromElems(es []message.IMessageElement) (rest.GameType, int
 		}
 	}
 	return rest.NoGame, 0
+}
+
+type LightAppShare struct {
+	App    string `json:"app"`
+	Config struct {
+		AutoSize bool                  `json:"autosize"`
+		CTime    runtime.UnixTimestamp `json:"ctime"`
+		Forward  bool                  `json:"forward"`
+		Token    string                `json:"token"`
+		Type     string                `json:"type"`
+	} `json:"config"`
+	Descr string `json:"desc"`
+	Extra struct {
+		AppType int   `json:"app_type"`
+		AppID   int   `json:"appid"`
+		MsgSeq  int64 `json:"msg_seq"`
+		Uin     int64 `json:"uin"`
+	} `json:"extra"`
+	Meta struct {
+		View map[string]struct {
+			Action         string `json:"action"`
+			AndroidPkgName string `json:"android_pkg_name"`
+			AppType        int    `json:"app_type"`
+			AppID          int64  `json:"appid"`
+			Descr          string `json:"desc"`
+			JumpURL        string `json:"jump_url"`
+			Preview        string `json:"preview"`
+			SourceIcon     string `json:"source_icon"`
+			SourceURL      string `json:"source_url"`
+			Tag            string `json:"tag"`
+			Title          string `json:"title"`
+		} `json:",inline"`
+	} `json:"meta"`
+	Prompt string `json:"prompt"`
+	Ver    string `json:"ver"`
+	View   string `json:"view"`
 }
 
 // 尽量把reply elements的内容替换成全的
