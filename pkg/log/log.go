@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog"
 )
 
@@ -36,6 +37,8 @@ func SubLogger(from string) Logger {
 }
 
 func initLogger() {
+	zerolog.InterfaceMarshalFunc = jsoniter.Marshal
+
 	currentDir, err := os.Getwd()
 	if err != nil {
 		currentDir = filepath.Dir(os.Args[0])
